@@ -37,6 +37,20 @@ Clean Sweep solves this with a **one-click cleanup workflow** and a **visual car
 3. **Backup & Delete** – Click the button. Clean Sweep creates a backup and then removes the selected items.
 4. **Restore** – If needed, restore themes/plugins from the ZIP backups in `wp-content/clean-sweep-backups/`. Database backups are saved as SQL files.
 
+## Screenshots
+
+### Themes Tab
+![Clean Sweep Themes Tab](screenshots/themes-tab.png)
+
+### Plugins Tab
+![Clean Sweep Plugins Tab](screenshots/plugins-tab.png)
+
+### Media Tab
+![Clean Sweep Media Tab](screenshots/media-tab.png)
+
+### Database Cleanup Tab
+![Clean Sweep Database Tab](screenshots/database-tab.png)
+
 ## Frequently Asked Questions
 
 ### Is it safe to delete active themes or plugins?
