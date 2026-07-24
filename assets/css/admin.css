@@ -1,0 +1,128 @@
+.clean-sweep-wrap {
+    max-width: 1200px;
+}
+
+.clean-sweep-tabs {
+    margin: 20px 0;
+    border-bottom: 2px solid #c3c4c7;
+}
+
+.clean-sweep-tabs a {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #3c434a;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.clean-sweep-tabs a.active,
+.clean-sweep-tabs a:hover {
+    border-bottom-color: #2271b1;
+    color: #2271b1;
+}
+
+.clean-sweep-search {
+    margin: 15px 0;
+    display: flex;
+    gap: 8px;
+}
+
+.clean-sweep-search input[type="search"] {
+    width: 300px;
+}
+
+.clean-sweep-actions {
+    margin: 15px 0;
+}
+
+.clean-sweep-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.clean-sweep-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.clean-sweep-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.clean-sweep-card.active {
+    border-left: 4px solid #00a32a;
+}
+
+.clean-sweep-card.inactive {
+    border-left: 4px solid #d63638;
+}
+
+.clean-sweep-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    border-bottom: 1px solid #c3c4c7;
+    cursor: pointer;
+}
+
+.clean-sweep-card-header input[type="checkbox"] {
+    margin: 0;
+}
+
+.clean-sweep-card-header strong {
+    flex: 1;
+    word-break: break-word;
+}
+
+.clean-sweep-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.clean-sweep-badge.active {
+    background: #e5f5e8;
+    color: #00a32a;
+}
+
+.clean-sweep-badge.inactive {
+    background: #ffe6e6;
+    color: #d63638;
+}
+
+.clean-sweep-card-body {
+    padding: 12px 15px;
+}
+
+.clean-sweep-card-body p {
+    margin: 5px 0;
+    color: #3c434a;
+}
+
+.clean-sweep-thumb {
+    max-width: 100%;
+    max-height: 120px;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.clean-sweep-pagination {
+    margin-top: 15px;
+}
+
+.clean-sweep-pagination a {
+    margin-right: 5px;
+    text-decoration: none;
+}
