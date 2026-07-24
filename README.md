@@ -40,16 +40,16 @@ Clean Sweep solves this with a **one-click cleanup workflow** and a **visual car
 ## Screenshots
 
 ### Themes Tab
-![Clean Sweep Themes Tab](screenshots/themes-tab.png)
+![Clean Sweep Themes Tab](https://raw.githubusercontent.com/mrshahbazdev/clean-sweep/main/screenshots/themes-tab.png)
 
 ### Plugins Tab
-![Clean Sweep Plugins Tab](screenshots/plugins-tab.png)
+![Clean Sweep Plugins Tab](https://raw.githubusercontent.com/mrshahbazdev/clean-sweep/main/screenshots/plugins-tab.png)
 
 ### Media Tab
-![Clean Sweep Media Tab](screenshots/media-tab.png)
+![Clean Sweep Media Tab](https://raw.githubusercontent.com/mrshahbazdev/clean-sweep/main/screenshots/media-tab.png)
 
 ### Database Cleanup Tab
-![Clean Sweep Database Tab](screenshots/database-tab.png)
+![Clean Sweep Database Tab](https://raw.githubusercontent.com/mrshahbazdev/clean-sweep/main/screenshots/database-tab.png)
 
 ## Frequently Asked Questions
 
