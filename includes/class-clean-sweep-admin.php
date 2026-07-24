@@ -49,8 +49,10 @@ class Clean_Sweep_Admin {
 			'clean-sweep-admin',
 			'clean_sweep_i18n',
 			array(
-				'selectAll'   => __( 'Select All', 'clean-sweep' ),
-				'deselectAll' => __( 'Deselect All', 'clean-sweep' ),
+				'selectAll'       => __( 'Select All', 'clean-sweep' ),
+				'deselectAll'     => __( 'Deselect All', 'clean-sweep' ),
+				'selected'        => __( '%d selected', 'clean-sweep' ),
+				'nothingSelected' => __( 'Please select at least one item.', 'clean-sweep' ),
 			)
 		);
 	}
@@ -178,6 +180,8 @@ class Clean_Sweep_Admin {
 				<button type="submit" class="button"><?php esc_html_e( 'Search', 'clean-sweep' ); ?></button>
 			</form>
 
+			<?php self::render_summary( $tab, $search ); ?>
+
 			<form method="post" action="<?php echo esc_url( admin_url( 'tools.php?page=clean-sweep&tab=' . $tab ) ); ?>" class="clean-sweep-form">
 				<?php wp_nonce_field( 'clean_sweep_action' ); ?>
 				<input type="hidden" name="cs_type" value="<?php echo esc_attr( $tab ); ?>">
@@ -187,6 +191,7 @@ class Clean_Sweep_Admin {
 					<button type="submit" class="button button-primary" onclick="return confirm('<?php esc_attr_e( 'This will backup and delete selected items. Continue?', 'clean-sweep' ); ?>')">
 						<?php esc_html_e( 'Backup & Delete Selected', 'clean-sweep' ); ?>
 					</button>
+					<span class="clean-sweep-selected-count"></span>
 				</div>
 
 				<div class="clean-sweep-grid">
@@ -208,6 +213,122 @@ class Clean_Sweep_Admin {
 					?>
 				</div>
 			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render summary dashboard.
+     *
+     * @param string $tab    Current tab.
+     * @param string $search Search query.
+     */
+	private static function render_summary( $tab, $search ) {
+		global $wpdb;
+
+		$cards = array();
+		switch ( $tab ) {
+			case 'themes':
+				$themes   = wp_get_themes();
+				$active   = get_stylesheet();
+				$total    = count( $themes );
+				$inactive = 0;
+				$size     = 0;
+				foreach ( $themes as $slug => $theme ) {
+					if ( $search && false === stripos( $theme->get( 'Name' ), $search ) && false === stripos( $slug, $search ) ) {
+						continue;
+					}
+					$s = self::dir_size( $theme->get_stylesheet_directory() );
+					$size += $s;
+					if ( $slug !== $active ) {
+						$inactive++;
+					}
+				}
+				$cards = array(
+					'total'    => array( 'label' => __( 'Total Themes', 'clean-sweep' ), 'value' => $total ),
+					'inactive' => array( 'label' => __( 'Inactive', 'clean-sweep' ), 'value' => $inactive ),
+					'size'     => array( 'label' => __( 'Total Size', 'clean-sweep' ), 'value' => size_format( $size ) ),
+				);
+				break;
+			case 'plugins':
+				$plugins        = get_plugins();
+				$active_plugins = wp_get_active_and_valid_plugins();
+				$active_slugs   = array_map( 'plugin_basename', $active_plugins );
+				$total          = count( $plugins );
+				$inactive       = 0;
+				$size           = 0;
+				foreach ( $plugins as $slug => $data ) {
+					if ( $search && false === stripos( $data['Name'], $search ) && false === stripos( $slug, $search ) ) {
+						continue;
+					}
+					$path = WP_PLUGIN_DIR . '/' . $slug;
+					$s    = is_dir( $path ) ? self::dir_size( $path ) : ( file_exists( $path ) ? filesize( $path ) : 0 );
+					$size += $s;
+					if ( ! in_array( $slug, $active_slugs, true ) ) {
+						$inactive++;
+					}
+				}
+				$cards = array(
+					'total'    => array( 'label' => __( 'Total Plugins', 'clean-sweep' ), 'value' => $total ),
+					'inactive' => array( 'label' => __( 'Inactive', 'clean-sweep' ), 'value' => $inactive ),
+					'size'     => array( 'label' => __( 'Total Size', 'clean-sweep' ), 'value' => size_format( $size ) ),
+				);
+				break;
+			case 'media':
+				$query = new WP_Query(
+					array(
+						'post_type'      => 'attachment',
+						'post_status'    => 'inherit',
+						'post_mime_type' => 'image',
+						'posts_per_page' => -1,
+						's'              => $search,
+					)
+				);
+				$total = $query->found_posts;
+				$size  = 0;
+				foreach ( $query->posts as $post ) {
+					$meta = wp_get_attachment_metadata( $post->ID );
+					if ( ! empty( $meta['filesize'] ) ) {
+						$size += (int) $meta['filesize'];
+					} else {
+						$file = get_attached_file( $post->ID );
+						$size += file_exists( $file ) ? filesize( $file ) : 0;
+					}
+				}
+				$cards = array(
+					'total' => array( 'label' => __( 'Total Images', 'clean-sweep' ), 'value' => $total ),
+					'size'  => array( 'label' => __( 'Total Size', 'clean-sweep' ), 'value' => size_format( $size ) ),
+				);
+				break;
+			case 'database':
+				$revisions   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'revision'" );
+				$autodrafts  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status = 'auto-draft'" );
+				$trash       = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status = 'trash'" );
+				$spam        = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved = 'spam'" );
+				$orphan_meta = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} pm LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id WHERE p.ID IS NULL" );
+				$expired_ts  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_%' AND option_value < " . time() );
+				$cards       = array(
+					'revisions'   => array( 'label' => __( 'Revisions', 'clean-sweep' ), 'value' => $revisions ),
+					'autodrafts'  => array( 'label' => __( 'Auto-Drafts', 'clean-sweep' ), 'value' => $autodrafts ),
+					'trash'       => array( 'label' => __( 'Trash', 'clean-sweep' ), 'value' => $trash ),
+					'spam'        => array( 'label' => __( 'Spam', 'clean-sweep' ), 'value' => $spam ),
+					'orphan_meta' => array( 'label' => __( 'Orphan Meta', 'clean-sweep' ), 'value' => $orphan_meta ),
+					'transients'  => array( 'label' => __( 'Expired Transients', 'clean-sweep' ), 'value' => $expired_ts ),
+				);
+				break;
+		}
+
+		if ( empty( $cards ) ) {
+			return;
+		}
+		?>
+		<div class="clean-sweep-summary">
+			<?php foreach ( $cards as $key => $card ) : ?>
+				<div class="clean-sweep-summary-card <?php echo esc_attr( $key ); ?>">
+					<span class="clean-sweep-summary-label"><?php echo esc_html( $card['label'] ); ?></span>
+					<span class="clean-sweep-summary-value"><?php echo esc_html( $card['value'] ); ?></span>
+				</div>
+			<?php endforeach; ?>
 		</div>
 		<?php
 	}
